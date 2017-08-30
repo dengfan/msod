@@ -1,0 +1,36 @@
+/*
+    Zakum Entrance
+*/
+importPackage(net.sf.cherry.server.maps);
+importPackage(net.sf.cherry.net.channel);
+importPackage(net.sf.cherry.tools);
+
+
+function enter(pi) {
+	var nextMap = 211042400;
+//	if (pi.getQuestStatus(100200) != net.sf.odinms.client.MapleQuestStatus.Status.COMPLETED) {
+		// do nothing; send message to player
+//		pi.getPlayer().getClient().getSession().write(MaplePacketCreator.serverNotice(5, "你还没有完成扎昆任务//(ID:100200),不得挑战BOSS."));
+//		return false;	
+//	}
+	if (!pi.haveItem(4001017)) {
+		// do nothing; does not have Eye of Fire
+		sendMessage(pi,"你没有火焰的眼");
+		return false;
+	}
+		if (pi.getBossLog('ZAKUM')>=2) {
+			sendMessage(pi,"每天只能挑战2次");
+			return false;
+		}
+		if (pi.getPlayer().getClient().getChannel() !=2) {
+			sendMessage(pi,"只能在2线发动");
+			return false;
+		}
+	//else {
+		return pi.warp(211042400, "sp", "west00");
+	//}
+}
+function sendMessage(pi,message) {
+	pi.getPlayer().getClient().getSession().write(MaplePacketCreator.serverNotice(5, message));
+}
+
