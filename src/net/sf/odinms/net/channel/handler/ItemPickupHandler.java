@@ -140,10 +140,26 @@ public class ItemPickupHandler extends AbstractMaplePacketHandler {
     }
 
     static final boolean useItem(final MapleClient c, final int id) { //怪物书拣取效果操作
-        if (id / 1000000 == 2) {
-            MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-            if (ii.isConsumeOnPickup(id)) {
-                ii.getItemEffect(id).applyTo(c.getPlayer());
+        if (id >= 2000000 && id <= 2490000) {            
+            final MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+            final byte consumeval = ii.isConsumeOnPickup(id);
+
+            if (consumeval > 0) {
+                if (consumeval == 2) {
+                    if (c.getPlayer().getParty() != null) {
+                        for (final MaplePartyCharacter pc : c.getPlayer().getParty().getMembers()) {
+                            final MapleCharacter chr = c.getPlayer().getMap().getCharacterById(pc.getId());
+                            if (chr != null) {
+                                ii.getItemEffect(id).applyTo(chr);
+                            }
+                        }
+                    } else {
+                        ii.getItemEffect(id).applyTo(c.getPlayer());
+                    }
+                } else {
+                    ii.getItemEffect(id).applyTo(c.getPlayer());
+                }
+                c.getSession().write(MaplePacketCreator.getShowItemGain(id, (byte) 1));
                 return true;
             }
         }

@@ -96,7 +96,7 @@ public class MapleItemInformationProvider {
     protected Map<Integer, Map<String, String>> getExpCardTimes = new HashMap<Integer, Map<String, String>>();
     protected Map<Integer, Integer> scriptedItemCache = new HashMap<Integer, Integer>();
     protected Map<Integer, Integer> monsterBookID = new HashMap<Integer, Integer>();
-    protected Map<Integer, Boolean> consumeOnPickupCache = new HashMap<Integer, Boolean>();
+    protected Map<Integer, Byte> consumeOnPickupCache = new HashMap<Integer, Byte>();
     protected Map<Integer, List<Integer>> scrollRestrictionCache = new HashMap<Integer, List<Integer>>();
     protected Map<Integer, Boolean> karmaCache = new HashMap<Integer, Boolean>();
     protected Map<Integer, List<MapleFish>> fishingCache = new HashMap<Integer, List<MapleFish>>();
@@ -1203,15 +1203,21 @@ public class MapleItemInformationProvider {
         return bRestricted;
     }
 
-    public boolean isConsumeOnPickup(int itemId) {
+    public final byte isConsumeOnPickup(final int itemId) {
+        // 0 = not, 1 = consume on pickup, 2 = consume + party
         if (consumeOnPickupCache.containsKey(itemId)) {
             return consumeOnPickupCache.get(itemId);
         }
-
-        MapleData data = getItemData(itemId);
-
-        boolean consume = MapleDataTool.getIntConvert("spec/consumeOnPickup", data, 0) == 1 || MapleDataTool.getIntConvert("specEx/consumeOnPickup", data, 0) == 1;
-
+        final MapleData data = getItemData(itemId);
+        byte consume = (byte) MapleDataTool.getIntConvert("spec/consumeOnPickup", data, 0);
+        if (consume == 0) {
+            consume = (byte) MapleDataTool.getIntConvert("specEx/consumeOnPickup", data, 0);
+        }
+        if (consume == 1) {
+            if (MapleDataTool.getIntConvert("spec/party", getItemData(itemId), 0) > 0) {
+                consume = 2;
+            }
+        }
         consumeOnPickupCache.put(itemId, consume);
         return consume;
     }

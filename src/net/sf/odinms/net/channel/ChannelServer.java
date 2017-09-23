@@ -88,7 +88,6 @@ import net.sf.odinms.tools.MaplePacketCreator;
 //import org.apache.mina.filter.codec.ProtocolCodecFilter;
 //import org.apache.mina.transport.socket.nio.SocketAcceptor;
 //import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
-
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.buffer.SimpleBufferAllocator;
 import org.apache.mina.core.filterchain.IoFilter;
@@ -169,11 +168,10 @@ public class ChannelServer implements Runnable, ChannelServerMBean {
                         //FileReader fr = new FileReader(System.getProperty("net.sf.odinms.channel.config"));
                         //initialProp.load(fr);
                         //fr.close();
-                        
+
                         //停用RMI
                         //Registry registry = LocateRegistry.getRegistry(initialProp.getProperty("net.sf.odinms.world.host", "127.0.0.1"), Registry.REGISTRY_PORT, new SslRMIClientSocketFactory());
                         //worldRegistry = (WorldRegistry) registry.lookup("WorldRegistry");
-                        
                         worldRegistry = WorldRegistryImpl.getInstance();
                         cwi = new ChannelWorldInterfaceImpl(this);
                         wci = worldRegistry.registerChannelServer(key, cwi);
@@ -189,7 +187,7 @@ public class ChannelServer implements Runnable, ChannelServerMBean {
                         gmWhiteText = Boolean.parseBoolean(props.getProperty("net.sf.odinms.world.gmWhiteText", "false"));
                         cashshop = Boolean.parseBoolean(props.getProperty("net.sf.odinms.world.cashshop", "false"));
                         mts = Boolean.parseBoolean(props.getProperty("net.sf.odinms.world.mts", "false"));
-                        
+
                         DatabaseConnection.setProps(props);
                         DatabaseConnection.getConnection();
                         wci.serverReady();
@@ -247,46 +245,45 @@ public class ChannelServer implements Runnable, ChannelServerMBean {
 //        } catch (IOException e) {
 //            log.error("Binding to port " + port + " failed (ch: " + getChannel() + ")", e);
 //        }
-        
+
         acceptor.getFilterChain().addLast("codec", (IoFilter) new ProtocolCodecFilter(new MapleCodecFactory()));
         try {
             MapleServerHandler serverHandler = new MapleServerHandler(PacketProcessor.getProcessor(), channel);
             acceptor.setHandler(serverHandler);
             acceptor.bind(new InetSocketAddress(port));
             ((SocketSessionConfig) acceptor.getSessionConfig()).setTcpNoDelay(true);
-            
+
             log.info("Channel {}: Listening on port {}", getChannel(), port);
             wci.serverReady();
             eventSM.init();
         } catch (IOException e) {
             log.error("Binding to port " + port + " failed (ch: " + getChannel() + ")", e);
         }
-        
+
         TimerManager tMan = TimerManager.getInstance();
         tMan.start();
-        tMan.register(AutobanManager.getInstance(), 60000);
-        tMan.register(new respawnMaps(), 10000);
-        tMan.register(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    getWorldInterface().broadcastMessage(null, MaplePacketCreator.serverNotice(6, "[系统信息] 服务器正试图释放内存，请注意任何网络中断或网络延迟。").getBytes());
-                    System.gc();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    try {
-                        getWorldInterface().broadcastGMMessage(null, MaplePacketCreator.serverNotice(6, "[系统信息] 释放服务器内存空间失败。").getBytes());
-                    } catch (Throwable t) {
-                        // give up
-                    }
+        tMan.register(new respawnMaps(), 10000); // 每10秒执行一次地图刷怪
+        tMan.register(new systemGc(), 64800000, 64800000); // 每18个小时请求一次垃圾回收
+    }
 
+    private class systemGc implements Runnable {
+        @Override
+        public void run() {
+            try {
+                getWorldInterface().broadcastMessage(null, MaplePacketCreator.serverNotice(6, "[系统信息] 服务器正试图释放内存，请注意任何网络中断或网络延迟。").getBytes());
+                System.gc();
+            } catch (Throwable e) {
+                e.printStackTrace();
+                try {
+                    getWorldInterface().broadcastGMMessage(null, MaplePacketCreator.serverNotice(6, "[系统信息] 释放服务器内存空间失败。").getBytes());
+                } catch (Throwable t) {
+                    // give up
                 }
             }
-        }, 64800000, 64800000);
+        }
     }
 
     private class respawnMaps implements Runnable {
-
         @Override
         public void run() {
             for (Entry<Integer, MapleMap> map : mapFactory.getMaps().entrySet()) {
@@ -300,7 +297,7 @@ public class ChannelServer implements Runnable, ChannelServerMBean {
             eventSM.cancel();
         } catch (Exception e) {
         }
-        
+
         shutdown = true;
         List<CloseFuture> futures = new LinkedList<>();
         Collection<MapleCharacter> allchars = players.getAllCharacters();
@@ -645,7 +642,7 @@ public class ChannelServer implements Runnable, ChannelServerMBean {
         try (FileReader fileReader = new FileReader("mxmxd.properties")) {
             initialProp.load(fileReader);
         }
-        
+
         DatabaseConnection.setProps(initialProp);
         DatabaseConnection.getConnection();
         Connection c = DatabaseConnection.getConnection();
@@ -663,11 +660,10 @@ public class ChannelServer implements Runnable, ChannelServerMBean {
         } catch (SQLException ex) {
             log.error("Could not reset databases", ex);
         }
-        
+
         //停用RMI
         //Registry registry = LocateRegistry.getRegistry(initialProp.getProperty("net.sf.odinms.world.host", "127.0.0.1"), Registry.REGISTRY_PORT, new SslRMIClientSocketFactory());
         //worldRegistry = (WorldRegistry) registry.lookup("WorldRegistry");
-        
         //依配置启动频道服务
         worldRegistry = WorldRegistryImpl.getInstance();
         int chlCount = Integer.parseInt(initialProp.getProperty("net.sf.odinms.channel.count", "0"));
@@ -675,7 +671,7 @@ public class ChannelServer implements Runnable, ChannelServerMBean {
             String chlKey = initialProp.getProperty("net.sf.odinms.channel." + i + ".key");
             newInstance(chlKey).run();
         }
-        
+
         CommandProcessor.registerMBean();
         /*
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -699,7 +695,7 @@ public class ChannelServer implements Runnable, ChannelServerMBean {
                 }
             }
         });
-        */
+         */
     }
 
     public static void start() throws FileNotFoundException, IOException, NotBoundException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException, MalformedObjectNameException {

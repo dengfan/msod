@@ -521,8 +521,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements In
         ret.world = rs.getInt("world");
 
         ret.bookCover = rs.getInt("monsterbookcover");
-        ret.monsterbook = new MonsterBook();
-        ret.monsterbook.loadCards(charid);
+        ret.monsterbook = MonsterBook.loadCards(charid);
 
         ret.rank = rs.getInt("rank");
         ret.rankMove = rs.getInt("rankMove");
@@ -1042,6 +1041,8 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements In
                 }
                 mxmxdGainExpMonsterLogs.clear();
             }
+            
+            monsterbook.saveCards(getId());
 
             if (update) {
                 ps = con.prepareStatement("UPDATE characters SET level = ?, fame = ?, str = ?, dex = ?, luk = ?, `int` = ?, exp = ?, hp = ?, mp = ?, maxhp = ?, maxmp = ?, sp = ?, ap = ?, gm = ?, skincolor = ?, gender = ?, job = ?, hair = ?, face = ?, map = ?, meso = ?, hpApUsed = ?, mpApUsed = ?, spawnpoint = ?, party = ?, buddyCapacity = ?, autoHpPot = ?, autoMpPot = ?, messengerid = ?, messengerposition = ?, married = ?, partnerid = ?, cantalk = ?, zakumlvl = ?, marriagequest = ?, bosspoints = ?, bossrepeats = ?, nextBQ = ?, playerNPC = ?, alliancerank = ?, muted = ?, unmutetime = ?, equipSlots = ?, useSlots = ?, setupSlots = ?, etcSlots = ?, cashSlots = ?, monsterbookcover = ?, mountlevel = ?, mountexp = ?, mounttiredness = ?, dojoPoints = ?, lastDojoStage = ?, finishedDojoTutorial = ?, vanquisherStage = ?, vanquisherKills = ?, Warning = ? WHERE id = ?");
@@ -1143,7 +1144,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements In
             ps.setInt(46, getInventory(MapleInventoryType.ETC).getSlots());
             ps.setInt(47, getInventory(MapleInventoryType.CASH).getSlots());
             ps.setInt(48, bookCover);
-            //monsterbook.saveCards(getId());
+            
             if (maplemount != null) {
                 ps.setInt(49, maplemount.getLevel());
                 ps.setInt(50, maplemount.getExp());

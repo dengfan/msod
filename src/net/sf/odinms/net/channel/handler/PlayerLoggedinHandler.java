@@ -218,7 +218,7 @@ public class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
         //player.expirationTask();
         c.getSession().write(MaplePacketCreator.showCharCash(c.getPlayer()));
         c.getSession().write(MaplePacketCreator.weirdStatUpdate());
-        System.out.println(String.format("----------> [角色登入] (%s) %s lv.%s 已登入，地图：%s(%s)，时间：%s", c.getPlayer().getId(), c.getPlayer().getName(), c.getPlayer().getLevel(), c.getPlayer().getMap().getMapName(), c.getPlayer().getMap().getId(), FileoutputUtil.NowTime()));
+        System.out.println(String.format("@%s [chr login] (%s) %s lv.%s, map: %s(%s)", FileoutputUtil.NowTime(), c.getPlayer().getId(), c.getPlayer().getName(), c.getPlayer().getLevel(), c.getPlayer().getMap().getMapName(), c.getPlayer().getMap().getId()));
         
         if (!c.isGM()) {
             String gender = c.getPlayer().getGender() == 0 ? "他" : "她";

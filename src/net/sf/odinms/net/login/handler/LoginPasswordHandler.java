@@ -81,6 +81,7 @@ public class LoginPasswordHandler implements MaplePacketHandler {
             c.getSession().write(MaplePacketCreator.getEndOfServerList());
             LoginWorker.getInstance().updateLoad();
         }
-        System.out.println(String.format("----------> [账号登入] 账号 %s 已登入，IP：%s，时间：%s", login, c.getSession().getRemoteAddress(), FileoutputUtil.NowTime()));
+        
+        System.out.println(String.format("@%s [acc login] %s, IP: %s", FileoutputUtil.NowTime(), login, c.getSession().getRemoteAddress()));
     }
 }

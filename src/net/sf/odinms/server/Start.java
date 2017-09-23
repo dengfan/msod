@@ -40,22 +40,21 @@ public class Start {
         //String key = System.getProperty("javax.net.ssl.keyStore");
         //System.out.println(key);
         try {
-            System.out.println("1. 启动世界服务器开始");
             WorldServer.start();
-            System.out.println("::::: 世界服务器启动完成 :::::");
+            System.out.println(":::::::::: World server launched ::::::::::");
 
-            System.out.println("2. 启动登陆服务器开始");
             LoginServer.start();
-            System.out.println("::::: 登录服务器启动完成 :::::");
+            System.out.println(":::::::::: Login server launched ::::::::::");
 
-            System.out.println("3. 启动频道服务器开始");
             ChannelServer.start();
-            System.out.println("::::: 频道服务器启动完成 :::::");
+            System.out.println(":::::::::: Channel server launched ::::::::::");
 
-//            System.out.println("4. 启动 GUI控制台开始");
-//            GUI.main(null);
-//            System.out.println("::::: GUI控制台启动完成 :::::");
-            System.out.println("----------> 服务端启动完成！消耗时间：" + (System.currentTimeMillis() - currentTime) / 1000.0 + "秒 <----------");
+            //GUI.main(null);
+            //System.out.println("4. GUI manager launched :::::");
+            
+            System.out.println("=============================================");
+            System.out.println(" All server launched successfully! Time: " + (System.currentTimeMillis() - currentTime) / 1000.0 + "s");
+            System.out.println("=============================================");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (NotBoundException e) {
