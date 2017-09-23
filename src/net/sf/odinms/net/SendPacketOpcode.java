@@ -83,7 +83,7 @@ public enum SendPacketOpcode implements WritableIntValueHolder {
     DOJO_WARP_UP,
     ENERGY,
     KILL_MONSTER, // 0x9f
-    DROP_ITEM_FROM_MAPOBJECT, // 0xC1
+    DROP_ITEM_FROM_MAPOBJECT, // 0x110
     FACIAL_EXPRESSION, // 0x85
     MOVE_PLAYER, // 0x7E
     MOVE_MONSTER, // 0xA2

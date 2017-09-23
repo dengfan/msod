@@ -17,8 +17,7 @@
 
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package net.sf.odinms.server.maps;
 
 import java.awt.Point;
@@ -45,7 +44,9 @@ public class MapleMapItem extends AbstractMapleMapObject {
     protected boolean pickedUp = false;
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MapleMapItem.class);
 
-    /** Creates a new instance of MapleMapItem */
+    /**
+     * Creates a new instance of MapleMapItem
+     */
     public MapleMapItem(IItem item, Point position, MapleMapObject dropper, MapleCharacter owner) {
         setPosition(position);
         this.item = item;
@@ -98,6 +99,9 @@ public class MapleMapItem extends AbstractMapleMapObject {
 
     @Override
     public void sendSpawnData(MapleClient client) {
+        if (client.getPlayer().IsCheating) {
+            return;
+        }
         if (getMeso() > 0) {
             client.getSession().write(MaplePacketCreator.dropMesoFromMapObject(getMeso(), getObjectId(), getDropper().getObjectId(), getOwner().getId(), null, getPosition(), (byte) 2));
         } else {

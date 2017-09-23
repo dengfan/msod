@@ -319,6 +319,9 @@ public class MapleMap {
         spawnAndAddRangedMapObject(mdrop, new DelayedPacketCreation() {
 
             public void sendPackets(MapleClient c) {
+                if (c.getPlayer().IsCheating) {
+                    return;
+                }
                 c.getSession().write(MaplePacketCreator.dropMesoFromMapObject(meso, mdrop.getObjectId(), dropper.getObjectId(),
                         ffaLoot ? 0 : owner.getId(), dropper.getPosition(), droppos, (byte) 1));
             }
@@ -530,6 +533,9 @@ public class MapleMap {
                             spawnAndAddRangedMapObject(mdrop, new DelayedPacketCreation() {
 
                                 public void sendPackets(MapleClient c) {
+                                    if (c.getPlayer().IsCheating) {
+                                        return;
+                                    }
                                     c.getSession().write(MaplePacketCreator.dropItemFromMapObject(drop, mdrop.getObjectId(), dropMonster.getObjectId(), explosive ? 0 : dropChar.getId(), dropMonster.getPosition(), dropPos, (byte) 1));
                                     activateItemReactors(mdrop);
                                 }
@@ -1222,18 +1228,27 @@ public class MapleMap {
     }
 
     public void disappearingItemDrop(final MapleMapObject dropper, final MapleCharacter owner, final IItem item, Point pos) {
+        if (owner.IsCheating) {
+            return;
+        }
         final Point droppos = calcDropPos(pos, pos);
         final MapleMapItem drop = new MapleMapItem(item, droppos, dropper, owner);
         broadcastMessage(MaplePacketCreator.dropItemFromMapObject(item.getItemId(), drop.getObjectId(), 0, 0, dropper.getPosition(), droppos, (byte) 3), drop.getPosition());
     }
 
     public void spawnItemDrop(final MapleMapObject dropper, final MapleCharacter owner, final IItem item, Point pos, final boolean ffaDrop, final boolean expire) {
+        if (owner.IsCheating) {
+            return;
+        }
         TimerManager tMan = TimerManager.getInstance();
         final Point droppos = calcDropPos(pos, pos);
         final MapleMapItem drop = new MapleMapItem(item, droppos, dropper, owner);
         spawnAndAddRangedMapObject(drop, new DelayedPacketCreation() {
 
             public void sendPackets(MapleClient c) {
+                if (c.getPlayer().IsCheating) {
+                    return;
+                }
                 c.getSession().write(MaplePacketCreator.dropItemFromMapObject(item.getItemId(), drop.getObjectId(), 0, ffaDrop ? 0 : owner.getId(),
                         dropper.getPosition(), droppos, (byte) 1));
             }

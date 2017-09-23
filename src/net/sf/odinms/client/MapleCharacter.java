@@ -283,6 +283,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements In
     private static final int killedLimit = 1000;
     private static final int tiredMinutes = 600;
     private static final int expGainLimit = 500;
+    public boolean IsCheating = false;
 
     public long getCopytime() {
         return copytime;
@@ -3030,35 +3031,37 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements In
 
         // 高效杀怪判断
         if (spend >= 0 && spend < 12) {
-            getMap().removeDrops(this); // 清除掉落物品
+            IsCheating = true;
             天谴降临();
             return;
         } else if (spend >= 12 && spend < 16) {
-            getMap().removeDrops(this); // 清除掉落物品
+            IsCheating = true;
             return;
         } else if (spend >= 16 && spend < 100) {
             gain = (int) Math.floor(gain * 0.1);
             if (gain > level) {
                 gain = level;
             }
-            getMap().removeDrops(this); // 清除掉落物品
+            IsCheating = true;
         } else if (spend >= 100 && spend < 130) {
             gain = (int) Math.floor(gain * 0.4);
             if (gain > level * 4) {
                 gain = level * 2;
             }
-            getMap().removeDrops(this); // 清除掉落物品
+            IsCheating = true;
         } else if (spend >= 130 && spend < 160) {
             gain = (int) Math.floor(gain * 0.8);
             if (gain > level * 8) {
                 gain = level * 4;
             }
+            IsCheating = false;
         } else if (spend >= 260 && spend < 320) {
             gain = (int) Math.floor(gain * 2);
+            IsCheating = false;
         }
 
         if (isGM() || (id == 2 && ServerConstants.WRITEPACKET)) {
-            dropMessage(5, String.format("%s:%s:%s, mlv:%s, mhp:%s, x:%s, y:%s, 吸怪指数:%s, 无敌指数:%s", hpNow, hp, 无敌指数, mobLv, mobHp, pos.x, pos.y, 吸怪指数, 无敌指数));
+            dropMessage(5, String.format("chp:%s/%s, mlv:%s, mhp:%s, x:%s, y:%s, 吸怪指数:%s, 无敌指数:%s", hpNow, hp, mobLv, mobHp, pos.x, pos.y, 吸怪指数, 无敌指数));
         }
 
         c++;
