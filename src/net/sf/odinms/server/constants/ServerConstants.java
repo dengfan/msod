@@ -23,5 +23,5 @@ package net.sf.odinms.server.constants;
 
 public class ServerConstants {
     public static final byte FLAG = 3;
-    public static boolean WRITEPACKET = false;
+    public static boolean WRITEPACKET = true;
 }

@@ -522,7 +522,6 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements In
         ret.world = rs.getInt("world");
 
         ret.bookCover = rs.getInt("monsterbookcover");
-        ret.monsterbook = MonsterBook.loadCards(charid);
 
         ret.rank = rs.getInt("rank");
         ret.rankMove = rs.getInt("rankMove");
@@ -553,6 +552,8 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject implements In
         c.setTime(new Date(rs.getLong("unmutetime")));
         ret.unmuteTime = c;
         if (channelserver) {
+            ret.monsterbook = MonsterBook.loadCards(charid);
+            
             MapleMapFactory mapFactory = ChannelServer.getInstance(client.getChannel()).getMapFactory();
             ret.map = mapFactory.getMap(ret.mapid);
             if (ret.map == null) { //char is on a map that doesn't exist warp it to henesys
