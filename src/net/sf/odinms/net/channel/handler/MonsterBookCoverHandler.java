@@ -23,16 +23,20 @@ package net.sf.odinms.net.channel.handler;
 
 import net.sf.odinms.client.MapleClient;
 import net.sf.odinms.net.AbstractMaplePacketHandler;
-import net.sf.odinms.tools.MaplePacketCreator;
 import net.sf.odinms.tools.data.input.SeekableLittleEndianAccessor;
 
 public final class MonsterBookCoverHandler extends AbstractMaplePacketHandler {
 
+    public static boolean isMonsterCard(final int id) {
+        return id / 10000 == 238;
+    }
+    
     public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
         int id = slea.readInt();
-        if (id == 0 || id / 10000 == 238) {
+        
+        if (id == 0 || isMonsterCard(id)) {
             c.getPlayer().setMonsterBookCover(id);
-            c.getSession().write(MaplePacketCreator.changeCover(id));
+            c.getPlayer().getMonsterBook().updateCard(c, id);
         }
     }
 }

@@ -7909,49 +7909,6 @@ public class MaplePacketCreator {
         return mplew.getPacket();
     }
 
-    public static MaplePacket addCard(boolean full, int cardid, int level) {
-        MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.WRITEPACKET) {
-            System.out.println("addCard--------------------");
-        }
-        mplew.writeShort(SendPacketOpcode.MONSTERBOOK_ADD.getValue());
-        mplew.write(full ? 0 : 1);
-        mplew.writeInt(cardid);
-        mplew.writeInt(level);
-        return mplew.getPacket();
-    }
-
-    public static MaplePacket showGainCard() {
-        MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.WRITEPACKET) {
-            System.out.println("showGainCard--------------------");
-        }
-        mplew.writeShort(SendPacketOpcode.SHOW_ITEM_GAIN_INCHAT.getValue());
-        mplew.write(0x0D);
-        return mplew.getPacket();
-    }
-
-    public static MaplePacket showForeginCardEffect(int id) {
-        MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.WRITEPACKET) {
-            System.out.println("showForeginCardEffect--------------------");
-        }
-        mplew.writeShort(SendPacketOpcode.SHOW_FOREIGN_EFFECT.getValue());
-        mplew.writeInt(id);
-        mplew.write(0x0D);
-        return mplew.getPacket();
-    }
-
-    public static MaplePacket changeCover(int cardid) {
-        MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        if (ServerConstants.WRITEPACKET) {
-            System.out.println("changeCover--------------------");
-        }
-        mplew.writeShort(SendPacketOpcode.MONSTER_BOOK_CHANGE_COVER.getValue());
-        mplew.writeInt(cardid);
-        return mplew.getPacket();
-    }
-
     public static MaplePacket getStatusMsg(int itemid) {
         MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         if (ServerConstants.WRITEPACKET) {

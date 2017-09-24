@@ -34,7 +34,7 @@ import net.sf.odinms.tools.data.output.MaplePacketLittleEndianWriter;
 import net.sf.odinms.tools.MonsterBookPacket;
 
 public class MonsterBook implements Serializable {
-
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MonsterBook.class);
     private static final long serialVersionUID = 7179541993413738569L;
     private boolean changed = false;
     private int SpecialCard = 0, NormalCard = 0, BookLevel = 1;
@@ -104,40 +104,56 @@ public class MonsterBook implements Serializable {
         ps.close();
         return new MonsterBook(cards);
     }
-
-    public final void saveCards(final int charid) throws SQLException {
-        if (!changed || cards.size() == 0) {
-            return;
-        }
+    
+    public boolean checkCardIsExists(final int charid, final int cardid) throws SQLException {
+        int count = 0;
+        
         final Connection con = DatabaseConnection.getConnection();
-        PreparedStatement ps = con.prepareStatement("DELETE FROM monsterbook WHERE charid = ?");
-        ps.setInt(1, charid);
-        ps.execute();
-        ps.close();
-
-        boolean first = true;
-        final StringBuilder query = new StringBuilder();
-
-        for (final Entry<Integer, Integer> all : cards.entrySet()) {
-            if (first) {
-                first = false;
-                query.append("INSERT INTO monsterbook VALUES (DEFAULT,");
-            } else {
-                query.append(",(DEFAULT,");
+        try (PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) as c FROM monsterbook WHERE charid = ? AND cardid = ?")) {
+            ps.setInt(1, charid);
+            ps.setInt(2, cardid);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt("c");
+                }
             }
-            query.append(charid);
-            query.append(",");
-            query.append(all.getKey()); // Card ID
-            query.append(",");
-            query.append(all.getValue()); // Card level
-            query.append(")");
+        } catch (SQLException ex) {
+            log.error("查询怪物卡是否已存在出错。", ex);
         }
-        ps = con.prepareStatement(query.toString());
-        ps.execute();
-        ps.close();
+        
+        return count > 0;
     }
 
-    private final void calculateLevel() {
+    public final void saveCards(final int charid) throws SQLException {
+        if (!changed || cards.isEmpty()) {
+            return;
+        }
+        
+        final Connection con = DatabaseConnection.getConnection();
+        
+        for (final Entry<Integer, Integer> pair : cards.entrySet()) {
+            int cardId = pair.getKey();
+            int cardLevel = pair.getValue();
+            boolean isExists = checkCardIsExists(charid, cardId);
+            
+            if (isExists) {
+                PreparedStatement ps = con.prepareStatement("UPDATE monsterbook SET level = ? WHERE charid = ? AND cardid = ?");
+                ps.setInt(1, cardLevel);
+                ps.setInt(2, charid);
+                ps.setInt(3, cardId);
+                ps.execute();
+                ps.close();
+            } else {
+                PreparedStatement ps = con.prepareStatement("INSERT INTO monsterbook (charid, cardid, `level`) VALUES (?, ?, 1);");
+                ps.setInt(1, charid);
+                ps.setInt(2, cardId);
+                ps.execute();
+                ps.close();
+            }
+        }
+    }
+
+    private void calculateLevel() {
         int Size = NormalCard + SpecialCard;
         BookLevel = 8;
 
